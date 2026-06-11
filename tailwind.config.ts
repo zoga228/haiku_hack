@@ -10,32 +10,32 @@ const config: Config = {
     extend: {
       colors: {
         surface: {
-          DEFAULT: "#0a0a0f",
-          card: "#13131a",
-          elevated: "#1a1a25",
+          DEFAULT: "#e8f7fd",
+          card: "rgba(255,255,255,0.68)",
+          elevated: "rgba(255,255,255,0.82)",
         },
         "b": {
-          DEFAULT: "rgba(255,255,255,0.08)",
-          hover: "rgba(255,255,255,0.15)",
-          accent: "rgba(99,102,241,0.3)",
+          DEFAULT: "rgba(50,103,138,0.14)",
+          hover: "rgba(50,103,138,0.24)",
+          accent: "rgba(35,136,201,0.28)",
         },
         content: {
-          DEFAULT: "#f0f0f5",
-          secondary: "#8a8a9a",
-          tertiary: "#5a5a6a",
+          DEFAULT: "#172033",
+          secondary: "#4e6374",
+          tertiary: "#7891a5",
         },
         accent: {
-          DEFAULT: "#6366f1",
-          light: "#818cf8",
-          dark: "#4f46e5",
-          violet: "#8b5cf6",
+          DEFAULT: "#2388c9",
+          light: "#59b7e8",
+          dark: "#145d8c",
+          violet: "#7bbfe7",
         },
         success: {
-          DEFAULT: "#10b981",
-          light: "#34d399",
+          DEFAULT: "#138c64",
+          light: "#58c69b",
         },
-        danger: "#ef4444",
-        warning: "#f59e0b",
+        danger: "#dc3b3b",
+        warning: "#d9911e",
       },
       fontFamily: {
         sans: ["var(--font-inter)", "system-ui", "sans-serif"],
@@ -53,8 +53,8 @@ const config: Config = {
           "100%": { backgroundPosition: "200% 0" },
         },
         "pulse-glow": {
-          "0%, 100%": { boxShadow: "0 0 15px rgba(99,102,241,0.2)" },
-          "50%": { boxShadow: "0 0 30px rgba(99,102,241,0.4)" },
+          "0%, 100%": { boxShadow: "0 14px 36px rgba(35,136,201,0.16)" },
+          "50%": { boxShadow: "0 18px 52px rgba(35,136,201,0.25)" },
         },
       },
       animation: {

@@ -1,5 +1,5 @@
-import { ProductSearch } from "@/components/product-search";
+import { VideoMarketplaceScroller } from "@/components/video-marketplace-scroller";
 
 export default function HomePage() {
-  return <ProductSearch />;
+  return <VideoMarketplaceScroller />;
 }

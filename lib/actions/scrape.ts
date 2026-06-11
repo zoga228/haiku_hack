@@ -1,6 +1,6 @@
 "use server";
 
-import type { Marketplace, Product, MarketplaceVariant } from "@/types/commerce";
+import type { Marketplace, MarketplaceVariant, Product } from "@/types/commerce";
 import {
   buildMarketplaceSearchUrl,
   fetchWithBrightData,
@@ -32,6 +32,7 @@ export async function scrapeMarketplaceProducts(
       uniqueMarketplaces.map(async (marketplace) => {
         const searchUrl = buildMarketplaceSearchUrl(marketplace, query);
         const html = await fetchWithBrightData(searchUrl);
+
         return parseMarketplaceOffers(html, searchUrl, {
           query,
           limit: marketplace === "Amazon" ? 18 : 8,
@@ -43,7 +44,7 @@ export async function scrapeMarketplaceProducts(
       result.status === "fulfilled" ? result.value : [],
     );
 
-    const mappedProducts: Product[] = parsedOffers
+    return parsedOffers
       .filter((offer) => offer.priceKzt && offer.title && offer.imageUrl)
       .map((offer, index) => {
         const retailPriceKzt = offer.priceKzt ?? 0;
@@ -70,14 +71,14 @@ export async function scrapeMarketplaceProducts(
         return {
           id: `live-${id}`,
           name: offer.title,
-          category: "Electronics", // Default fallback
-          subcategory: "Search Results",
+          category: "Electronics",
+          subcategory: "Live search",
           marketplace: offer.marketplace,
           originCountry: offer.originCountry,
           imageUrl: offer.imageUrl,
           description: "Live marketplace result parsed through Bright Data.",
           tags: ["live", "brightdata", "marketplace"],
-          specs: { Source: "Bright Data Web Unlocker", Query: query },
+          specs: { Query: query, Source: "Bright Data Web Unlocker" },
           variants: [variant],
           retailPriceKzt,
           groupPriceKzt,
@@ -87,11 +88,9 @@ export async function scrapeMarketplaceProducts(
           rating: offer.rating ?? 4.5,
           paymentMethods: ["Card", "Kaspi"],
           localizedNote:
-            "Live result parsed from marketplace HTML through Bright Data.",
-        };
+            "Prices are shown in KZT. External links open marketplace product pages.",
+        } satisfies Product;
       });
-
-    return mappedProducts;
   } catch (error) {
     console.error("Error fetching Bright Data live data:", error);
     return [];

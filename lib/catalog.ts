@@ -54,28 +54,25 @@ export function productMatchesQuery(product: Product, query: string) {
     .every((token) => getProductSearchText(product).includes(token));
 }
 
-export function scoreProduct(product: Product, options: {
-  query?: string;
-  category?: Category | "All";
-  subcategory?: string;
-  budgetKzt?: number;
-  searchHistory?: string[];
-}) {
+export function scoreProduct(
+  product: Product,
+  options: {
+    query?: string;
+    category?: Category | "All";
+    subcategory?: string;
+    budgetKzt?: number;
+    searchHistory?: string[];
+  },
+) {
   let score = 0;
   const searchText = getProductSearchText(product);
   const query = options.query?.trim().toLowerCase();
 
   if (query) {
     for (const token of query.split(/\s+/)) {
-      if (product.name.toLowerCase().includes(token)) {
-        score += 6;
-      }
-      if (product.subcategory.toLowerCase().includes(token)) {
-        score += 4;
-      }
-      if (searchText.includes(token)) {
-        score += 2;
-      }
+      if (product.name.toLowerCase().includes(token)) score += 6;
+      if (product.subcategory.toLowerCase().includes(token)) score += 4;
+      if (searchText.includes(token)) score += 2;
     }
   }
 
@@ -105,26 +102,12 @@ export function scoreProduct(product: Product, options: {
   return score;
 }
 
-export function sortProducts(
-  products: Product[],
-  sort: ProductSort,
-) {
+export function sortProducts(products: Product[], sort: ProductSort) {
   return [...products].sort((a, b) => {
-    if (sort === "price-asc") {
-      return a.retailPriceKzt - b.retailPriceKzt;
-    }
-
-    if (sort === "price-desc") {
-      return b.retailPriceKzt - a.retailPriceKzt;
-    }
-
-    if (sort === "wholesale-asc") {
-      return a.groupPriceKzt - b.groupPriceKzt;
-    }
-
-    if (sort === "wholesale-desc") {
-      return b.groupPriceKzt - a.groupPriceKzt;
-    }
+    if (sort === "price-asc") return a.retailPriceKzt - b.retailPriceKzt;
+    if (sort === "price-desc") return b.retailPriceKzt - a.retailPriceKzt;
+    if (sort === "wholesale-asc") return a.groupPriceKzt - b.groupPriceKzt;
+    if (sort === "wholesale-desc") return b.groupPriceKzt - a.groupPriceKzt;
 
     return a.retailPriceKzt - b.retailPriceKzt;
   });
@@ -135,17 +118,9 @@ export function sortVariants(
   sort: "price-asc" | "price-desc" | "wholesale-asc" | "wholesale-desc",
 ) {
   return [...variants].sort((a, b) => {
-    if (sort === "price-asc") {
-      return a.priceKzt - b.priceKzt;
-    }
-
-    if (sort === "price-desc") {
-      return b.priceKzt - a.priceKzt;
-    }
-
-    if (sort === "wholesale-asc") {
-      return a.wholesalePriceKzt - b.wholesalePriceKzt;
-    }
+    if (sort === "price-asc") return a.priceKzt - b.priceKzt;
+    if (sort === "price-desc") return b.priceKzt - a.priceKzt;
+    if (sort === "wholesale-asc") return a.wholesalePriceKzt - b.wholesalePriceKzt;
 
     return b.wholesalePriceKzt - a.wholesalePriceKzt;
   });

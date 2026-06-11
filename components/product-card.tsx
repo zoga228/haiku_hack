@@ -1,26 +1,26 @@
 import Link from "next/link";
-import { Star, UsersRound, TrendingDown } from "lucide-react";
+import { Star, TrendingDown, UsersRound } from "lucide-react";
 import { Badge, MarketplaceBadge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
 import { buttonClasses } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { getLowestRetailVariant, getVariantPriceRange } from "@/lib/catalog";
-import { formatKzt, getSavingsPercent, getMarketplaceColor } from "@/lib/format";
+import { formatKzt, getMarketplaceColor, getSavingsPercent } from "@/lib/format";
 import type { Product } from "@/types/commerce";
 
 type ProductCardProps = {
-  product: Product;
   compact?: boolean;
   index?: number;
-  selected?: boolean;
   onSelect?: (product: Product) => void;
+  product: Product;
+  selected?: boolean;
 };
 
 export function ProductCard({
-  product,
   compact = false,
   index = 0,
-  selected = false,
   onSelect,
+  product,
+  selected = false,
 }: ProductCardProps) {
   const lowestVariant = getLowestRetailVariant(product);
   const priceRange = getVariantPriceRange(product);
@@ -29,21 +29,21 @@ export function ProductCard({
 
   const content = (
     <Card
-      className={`group flex h-full flex-col overflow-hidden p-0 text-left transition-all hover:border-white/[0.12] hover-lift ${
-        selected ? "border-accent/40" : ""
+      className={`group flex h-full flex-col overflow-hidden p-0 text-left transition hover-lift ${
+        selected ? "ring-2 ring-accent/35" : ""
       }`}
     >
-      <div className="img-zoom relative aspect-[4/3] bg-surface-elevated">
+      <div className="img-zoom relative aspect-[4/3] bg-white/45">
         <img
-          src={imageUrl}
           alt={product.name}
           className="h-full w-full object-cover"
+          src={imageUrl}
         />
-        <div className="absolute inset-0 bg-gradient-to-t from-surface-card/80 via-transparent to-transparent" />
+        <div className="absolute inset-0 bg-gradient-to-t from-white/82 via-white/8 to-transparent" />
         <div className="absolute left-3 top-3 flex flex-wrap gap-1.5">
           <MarketplaceBadge
-            marketplace={lowestVariant.marketplace}
             color={getMarketplaceColor(lowestVariant.marketplace)}
+            marketplace={lowestVariant.marketplace}
           />
         </div>
         {savings > 0 ? (
@@ -66,7 +66,7 @@ export function ProductCard({
           </h3>
         </div>
         {!compact ? (
-          <p className="line-clamp-2 text-sm text-content-secondary">
+          <p className="line-clamp-2 text-sm leading-6 text-content-secondary">
             {product.description}
           </p>
         ) : null}
@@ -95,7 +95,7 @@ export function ProductCard({
             <span>{product.variants.length} предложений</span>
           </div>
           {onSelect ? (
-            <div className="grid gap-2 rounded-xl border border-white/[0.06] bg-white/[0.03] px-3 py-2 text-xs text-content-secondary sm:grid-cols-2">
+            <div className="grid gap-2 rounded-lg border border-white/70 bg-white/35 px-3 py-2 text-xs text-content-secondary sm:grid-cols-2">
               <span>Открыть описание</span>
               <span className="flex items-center gap-1 sm:justify-end">
                 <UsersRound className="size-3.5" />
@@ -104,13 +104,10 @@ export function ProductCard({
             </div>
           ) : (
             <div className="grid gap-2 sm:grid-cols-2">
-              <Link
-                href={`/products/${product.id}`}
-                className={buttonClasses("primary")}
-              >
+              <Link className={buttonClasses("primary")} href="/search">
                 Подробнее
               </Link>
-              <Link href="/groups" className={buttonClasses("secondary")}>
+              <Link className={buttonClasses("secondary")} href="/groups">
                 <UsersRound className="mr-1.5 size-4" />
                 Групповая
               </Link>
@@ -124,10 +121,10 @@ export function ProductCard({
   if (onSelect) {
     return (
       <button
-        type="button"
+        className="block h-full w-full animate-fade-in-up opacity-0"
         onClick={() => onSelect(product)}
-        className="block h-full w-full opacity-0 animate-fade-in-up"
         style={{ animationDelay: `${index * 0.06}s` }}
+        type="button"
       >
         {content}
       </button>
@@ -136,7 +133,7 @@ export function ProductCard({
 
   return (
     <div
-      className="opacity-0 animate-fade-in-up"
+      className="animate-fade-in-up opacity-0"
       style={{ animationDelay: `${index * 0.06}s` }}
     >
       {content}

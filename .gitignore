@@ -12,6 +12,7 @@ dist
 # Local env
 .env
 .env*.local
+data/social-db.json
 
 # Logs
 npm-debug.log*

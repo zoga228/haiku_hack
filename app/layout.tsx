@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import "./globals.css";
 import { AppShell } from "@/components/layout/app-shell";
+import "./globals.css";
 
 const inter = Inter({
   subsets: ["latin", "cyrillic"],
@@ -9,9 +9,9 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "LocalBazaar — live поиск товаров",
+  title: "CoiNIS — коллективные покупки и видео-маркетплейс",
   description:
-    "Live поиск товаров через Bright Data, сравнение маркетплейсов и групповая покупка с друзьями.",
+    "CoiNIS объединяет Supabase-видео, live-поиск маркетплейсов, карточки товаров и групповые покупки.",
 };
 
 export default function RootLayout({
@@ -20,7 +20,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="ru" className={inter.variable}>
+    <html lang="ru" className={inter.variable} suppressHydrationWarning>
       <body className="font-sans antialiased">
         <AppShell>{children}</AppShell>
       </body>

@@ -11,15 +11,15 @@ export function Badge({ className, variant = "default", ...props }: BadgeProps) 
   return (
     <span
       className={cn(
-        "inline-flex items-center rounded-full px-3 py-1 text-xs font-medium transition-colors",
+        "inline-flex items-center rounded-full px-3 py-1 text-xs font-medium",
         variant === "default" &&
-          "bg-white/[0.06] text-content-secondary border border-white/[0.06]",
+          "border border-white/70 bg-white/35 text-content-secondary",
         variant === "success" &&
-          "bg-success/10 text-success border border-success/20",
+          "border border-success/20 bg-success/10 text-success",
         variant === "accent" &&
-          "bg-accent/10 text-accent-light border border-accent/20",
+          "border border-accent/20 bg-accent/10 text-accent-dark",
         variant === "outline" &&
-          "border border-white/[0.1] text-content-secondary",
+          "border border-white/70 text-content-secondary",
         className,
       )}
       {...props}

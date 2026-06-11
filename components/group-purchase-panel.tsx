@@ -1,10 +1,11 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import type { FormEvent } from "react";
 import { ExternalLink, Plus, UserPlus, UsersRound } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
 import { buttonClasses } from "@/components/ui/button";
+import { Card } from "@/components/ui/card";
 import { getLowestRetailVariant } from "@/lib/catalog";
 import { formatKzt } from "@/lib/format";
 import type { Product } from "@/types/commerce";
@@ -23,8 +24,10 @@ type GroupPurchasePanelProps = {
   product?: Product | null;
 };
 
-const profileKey = "localbazaar-profile";
-const friendsKey = "localbazaar-friends";
+const profileKey = "coinis-profile";
+const friendsKey = "coinis-friends";
+const inputClasses =
+  "min-h-11 rounded-lg border border-white/70 bg-white/55 px-4 py-3 text-content outline-none transition focus:border-accent/40 focus:bg-white";
 
 export function GroupPurchasePanel({ product }: GroupPurchasePanelProps) {
   const [profile, setProfile] = useState<UserProfile | null>(null);
@@ -119,7 +122,7 @@ export function GroupPurchasePanel({ product }: GroupPurchasePanelProps) {
         <h2 className="mt-3 text-xl font-semibold text-content">
           Пользователь и друзья
         </h2>
-        <p className="mt-2 text-sm text-content-secondary">
+        <p className="mt-2 text-sm leading-6 text-content-secondary">
           Зарегистрируйтесь, добавьте друзей и соберите покупку вместе.
         </p>
       </div>
@@ -128,7 +131,7 @@ export function GroupPurchasePanel({ product }: GroupPurchasePanelProps) {
         <label className="grid gap-2 text-sm text-content-secondary">
           Ваше имя
           <input
-            className="min-h-11 rounded-xl border border-white/[0.1] bg-surface-elevated px-4 py-3 text-content outline-none focus:border-accent"
+            className={inputClasses}
             placeholder="Например, Айбек"
             value={profileName}
             onChange={(event) => setProfileName(event.target.value)}
@@ -137,7 +140,7 @@ export function GroupPurchasePanel({ product }: GroupPurchasePanelProps) {
         <label className="grid gap-2 text-sm text-content-secondary">
           Телефон или контакт
           <input
-            className="min-h-11 rounded-xl border border-white/[0.1] bg-surface-elevated px-4 py-3 text-content outline-none focus:border-accent"
+            className={inputClasses}
             placeholder="+7..."
             value={profilePhone}
             onChange={(event) => setProfilePhone(event.target.value)}
@@ -149,15 +152,16 @@ export function GroupPurchasePanel({ product }: GroupPurchasePanelProps) {
       </form>
 
       {profile ? (
-        <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-4 text-sm text-content-secondary">
-          Вы вошли как <span className="font-semibold text-content">{profile.name}</span>
+        <div className="rounded-lg border border-white/70 bg-white/35 p-4 text-sm text-content-secondary">
+          Вы вошли как{" "}
+          <span className="font-semibold text-content">{profile.name}</span>
         </div>
       ) : null}
 
       <div className="space-y-3">
         <form className="grid gap-2 sm:grid-cols-[1fr_auto]" onSubmit={addFriend}>
           <input
-            className="min-h-11 rounded-xl border border-white/[0.1] bg-surface-elevated px-4 py-3 text-content outline-none focus:border-accent"
+            className={inputClasses}
             placeholder="Имя друга"
             value={friendName}
             onChange={(event) => setFriendName(event.target.value)}
@@ -172,16 +176,17 @@ export function GroupPurchasePanel({ product }: GroupPurchasePanelProps) {
           {friends.length > 0 ? (
             friends.map((friend) => {
               const selected = selectedFriendIds.includes(friend.id);
+
               return (
                 <button
-                  key={friend.id}
-                  type="button"
-                  onClick={() => toggleFriend(friend.id)}
                   className={`rounded-full border px-3 py-1.5 text-xs transition ${
                     selected
                       ? "border-success/30 bg-success/10 text-success"
-                      : "border-white/[0.08] text-content-secondary hover:bg-white/[0.06]"
+                      : "border-white/70 bg-white/30 text-content-secondary hover:bg-white/55"
                   }`}
+                  key={friend.id}
+                  onClick={() => toggleFriend(friend.id)}
+                  type="button"
                 >
                   {friend.name}
                 </button>
@@ -196,17 +201,15 @@ export function GroupPurchasePanel({ product }: GroupPurchasePanelProps) {
       </div>
 
       {product && primaryVariant ? (
-        <div className="space-y-4 rounded-2xl border border-white/[0.06] bg-surface-elevated p-4">
+        <div className="space-y-4 rounded-lg border border-white/70 bg-white/45 p-4">
           <div className="grid gap-3 sm:grid-cols-[72px_1fr]">
             <img
-              src={primaryVariant.imageUrl}
               alt={product.name}
-              className="aspect-square w-full rounded-xl object-cover sm:w-[72px]"
+              className="aspect-square w-full rounded-lg object-cover sm:w-[72px]"
+              src={primaryVariant.imageUrl}
             />
             <div>
-              <p className="text-xs text-content-tertiary">
-                Выбранный товар
-              </p>
+              <p className="text-xs text-content-tertiary">Выбранный товар</p>
               <h3 className="line-clamp-2 font-semibold text-content">
                 {product.name}
               </h3>
@@ -219,7 +222,7 @@ export function GroupPurchasePanel({ product }: GroupPurchasePanelProps) {
           <label className="grid gap-2 text-sm text-content-secondary">
             Количество на человека
             <input
-              className="min-h-11 rounded-xl border border-white/[0.1] bg-surface-card px-4 py-3 text-content outline-none focus:border-accent"
+              className={inputClasses}
               min={1}
               type="number"
               value={quantityPerPerson}
@@ -230,27 +233,12 @@ export function GroupPurchasePanel({ product }: GroupPurchasePanelProps) {
           </label>
 
           <div className="grid gap-3 text-sm sm:grid-cols-3">
-            <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-3">
-              <p className="text-content-tertiary">Участники</p>
-              <p className="text-lg font-semibold text-content">
-                {participantCount}
-              </p>
-            </div>
-            <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-3">
-              <p className="text-content-tertiary">Всего штук</p>
-              <p className="text-lg font-semibold text-content">
-                {totalQuantity}
-              </p>
-            </div>
-            <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-3">
-              <p className="text-content-tertiary">Цена за шт.</p>
-              <p className="text-lg font-semibold text-success">
-                {formatKzt(unitPrice)}
-              </p>
-            </div>
+            <Metric label="Участники" value={String(participantCount)} />
+            <Metric label="Всего штук" value={String(totalQuantity)} />
+            <Metric label="Цена за шт." value={formatKzt(unitPrice)} strong />
           </div>
 
-          <div className="rounded-xl border border-success/20 bg-success/5 p-4">
+          <div className="rounded-lg border border-success/20 bg-success/10 p-4">
             <p className="text-sm text-content-secondary">
               {groupReady
                 ? "Групповая цена активна."
@@ -269,27 +257,46 @@ export function GroupPurchasePanel({ product }: GroupPurchasePanelProps) {
 
           {selectedFriends.length > 0 ? (
             <div className="text-xs text-content-secondary">
-              В комнате: {profile?.name ?? "Вы"}, {" "}
+              В комнате: {profile?.name ?? "Вы"},{" "}
               {selectedFriends.map((friend) => friend.name).join(", ")}
             </div>
           ) : null}
 
           <a
-            href={primaryVariant.sourceUrl}
-            target="_blank"
-            rel="noreferrer"
             className={buttonClasses("primary")}
+            href={primaryVariant.sourceUrl}
+            rel="noreferrer"
+            target="_blank"
           >
             <ExternalLink className="mr-1.5 size-4" />
             Открыть товар на {primaryVariant.marketplace}
           </a>
         </div>
       ) : (
-        <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-4 text-sm text-content-secondary">
-          <Plus className="mb-2 size-4 text-accent-light" />
+        <div className="rounded-lg border border-white/70 bg-white/35 p-4 text-sm text-content-secondary">
+          <Plus className="mb-2 size-4 text-accent" />
           Выберите live-товар, чтобы создать групповую покупку.
         </div>
       )}
     </Card>
+  );
+}
+
+function Metric({
+  label,
+  strong = false,
+  value,
+}: {
+  label: string;
+  strong?: boolean;
+  value: string;
+}) {
+  return (
+    <div className="rounded-lg border border-white/70 bg-white/35 p-3">
+      <p className="text-content-tertiary">{label}</p>
+      <p className={`text-lg font-semibold ${strong ? "text-success" : "text-content"}`}>
+        {value}
+      </p>
+    </div>
   );
 }

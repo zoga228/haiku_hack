@@ -1,6 +1,7 @@
 "use client";
 
-import { FormEvent, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import type { FormEvent } from "react";
 import {
   ExternalLink,
   Globe,
@@ -22,12 +23,14 @@ import { formatKzt, getMarketplaceColor } from "@/lib/format";
 import type { Marketplace, Product } from "@/types/commerce";
 
 type LiveCategory = {
+  description: string;
   label: string;
   query: string;
-  description: string;
 };
 
-const searchStorageKey = "localbazaar-live-search-history";
+const searchStorageKey = "coinis-live-search-history";
+const inputClasses =
+  "min-h-12 w-full rounded-full border border-white/70 bg-white/60 py-3 pl-11 pr-4 text-content placeholder:text-content-tertiary outline-none transition focus:border-accent/40 focus:bg-white";
 
 const liveCategories: LiveCategory[] = [
   {
@@ -122,6 +125,7 @@ export function ProductSearch() {
   function saveSearch(value: string) {
     const normalized = value.trim();
     if (!normalized) return;
+
     setSearchHistory((current) =>
       [normalized, ...current.filter((item) => item !== normalized)].slice(0, 8),
     );
@@ -145,8 +149,11 @@ export function ProductSearch() {
       );
       setLiveProducts(results);
       setSelectedProduct(results[0] ?? null);
+
       if (results.length === 0) {
-        setError("Live-поиск не вернул товары. Попробуйте другой запрос или маркетплейс.");
+        setError(
+          "Live-поиск не вернул товары. Попробуйте другой запрос или маркетплейс.",
+        );
       }
     } catch (nextError) {
       console.error("Live search failed:", nextError);
@@ -177,12 +184,23 @@ export function ProductSearch() {
 
   return (
     <main className="space-y-8">
+      <section className="mx-auto max-w-4xl pt-6 text-center text-white">
+        <p className="text-sm font-medium text-white/70">CoiNIS live catalog</p>
+        <h1 className="mt-3 text-4xl font-semibold tracking-tight sm:text-6xl">
+          Найдите товар и соберите покупку вместе.
+        </h1>
+        <p className="mx-auto mt-5 max-w-2xl text-sm leading-6 text-white/74 sm:text-base">
+          Каталог ищет реальные предложения на маркетплейсах через Bright Data,
+          сравнивает цены в KZT и сразу подключает групповую покупку.
+        </p>
+      </section>
+
       <Card className="space-y-5">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
           <SectionHeader
+            description="Выберите категорию или введите запрос. Карточки приходят из live-поиска маркетплейсов, без мок-каталога."
             eyebrow="Live marketplace search"
             title="Ищем реальные товары через Bright Data"
-            description="Выберите категорию или введите запрос. Карточки ниже приходят из live-поиска маркетплейсов, без мок-каталога."
           />
           <Badge variant="accent">
             <Globe className="mr-1.5 size-3" />
@@ -194,14 +212,14 @@ export function ProductSearch() {
           <label className="relative block">
             <Search className="pointer-events-none absolute left-4 top-1/2 size-4 -translate-y-1/2 text-content-tertiary" />
             <input
-              className="min-h-12 w-full rounded-xl border border-white/[0.1] bg-surface-elevated py-3 pl-11 pr-4 text-content placeholder:text-content-tertiary outline-none transition-colors focus:border-accent"
+              className={inputClasses}
+              disabled={isLoading}
               placeholder="Например: 2K indoor security camera"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
-              disabled={isLoading}
             />
           </label>
-          <Button type="submit" disabled={isLoading || !query.trim()}>
+          <Button disabled={isLoading || !query.trim()} type="submit">
             {isLoading ? (
               <Loader2 className="mr-2 size-4 animate-spin" />
             ) : (
@@ -218,15 +236,15 @@ export function ProductSearch() {
           <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
             {liveCategories.map((category) => (
               <button
-                key={category.label}
-                type="button"
-                onClick={() => handleCategoryClick(category)}
-                disabled={isLoading}
-                className={`rounded-xl border p-3 text-left transition ${
+                className={`rounded-lg border p-3 text-left transition ${
                   activeCategory === category.label
-                    ? "border-accent/40 bg-accent/10"
-                    : "border-white/[0.08] bg-white/[0.03] hover:bg-white/[0.06]"
+                    ? "border-accent/35 bg-accent/10"
+                    : "border-white/70 bg-white/30 hover:bg-white/55"
                 }`}
+                disabled={isLoading}
+                key={category.label}
+                onClick={() => handleCategoryClick(category)}
+                type="button"
               >
                 <span className="font-semibold text-content">{category.label}</span>
                 <span className="mt-1 block text-xs leading-5 text-content-secondary">
@@ -244,16 +262,17 @@ export function ProductSearch() {
           <div className="flex flex-wrap gap-2">
             {marketplaceOptions.map((marketplace) => {
               const selected = selectedMarketplaces.includes(marketplace);
+
               return (
                 <button
-                  key={marketplace}
-                  type="button"
-                  onClick={() => toggleMarketplace(marketplace)}
                   className={`rounded-full border px-3 py-1.5 text-xs transition ${
                     selected
-                      ? "border-accent/30 bg-accent/10 text-accent-light"
-                      : "border-white/[0.08] text-content-secondary hover:bg-white/[0.06]"
+                      ? "border-accent/30 bg-accent/10 text-accent-dark"
+                      : "border-white/70 bg-white/30 text-content-secondary hover:bg-white/55"
                   }`}
+                  key={marketplace}
+                  onClick={() => toggleMarketplace(marketplace)}
+                  type="button"
                 >
                   {marketplace}
                 </button>
@@ -266,7 +285,7 @@ export function ProductSearch() {
           <div className="flex flex-wrap gap-2">
             {searchHistory.map((item) => (
               <button
-                className="rounded-full border border-white/[0.08] bg-white/[0.04] px-3 py-1.5 text-xs text-content-secondary transition hover:bg-white/[0.08] hover:text-content"
+                className="rounded-full border border-white/70 bg-white/35 px-3 py-1.5 text-xs text-content-secondary transition hover:bg-white/60 hover:text-content"
                 key={item}
                 onClick={() => {
                   setQuery(item);
@@ -278,7 +297,7 @@ export function ProductSearch() {
               </button>
             ))}
             <button
-              className="inline-flex items-center rounded-full border border-white/[0.08] px-3 py-1.5 text-xs text-content-tertiary transition hover:bg-white/[0.08] hover:text-content"
+              className="inline-flex items-center rounded-full border border-white/70 bg-white/25 px-3 py-1.5 text-xs text-content-tertiary transition hover:bg-white/60 hover:text-content"
               onClick={() => setSearchHistory([])}
               type="button"
             >
@@ -292,24 +311,22 @@ export function ProductSearch() {
       <section className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_420px]">
         <div className="space-y-5">
           <Card className="grid gap-3 md:grid-cols-[1fr_220px] md:items-end">
-            <div>
-              <SectionHeader
-                eyebrow={lastSearch ? `Запрос: ${lastSearch}` : "Результаты"}
-                title={
-                  isLoading
-                    ? "Ищем товары..."
-                    : `${visibleProducts.length} live-товаров найдено`
-                }
-                description="Нажмите на карточку, чтобы открыть описание здесь же и создать групповую покупку."
-              />
-            </div>
+            <SectionHeader
+              description="Нажмите на карточку, чтобы открыть описание здесь же и создать групповую покупку."
+              eyebrow={lastSearch ? `Запрос: ${lastSearch}` : "Результаты"}
+              title={
+                isLoading
+                  ? "Ищем товары..."
+                  : `${visibleProducts.length} live-товаров найдено`
+              }
+            />
             <label className="grid gap-2 text-sm font-medium text-content-secondary">
               <span className="flex items-center gap-2">
                 <SlidersHorizontal className="size-4" />
                 Сортировка
               </span>
               <select
-                className="min-h-11 rounded-xl border border-white/[0.1] bg-surface-elevated px-4 py-3 text-content outline-none transition-colors focus:border-accent"
+                className="min-h-11 rounded-lg border border-white/70 bg-white/55 px-4 py-3 text-content outline-none transition focus:border-accent/40 focus:bg-white"
                 value={sort}
                 onChange={(event) => setSort(event.target.value as ProductSort)}
               >
@@ -330,16 +347,16 @@ export function ProductSearch() {
           {isLoading ? (
             <div className="grid gap-5 sm:grid-cols-2">
               {[1, 2, 3, 4].map((item) => (
-                <Card key={item} className="h-96 animate-pulse bg-white/[0.02]" />
+                <Card key={item} className="h-96 animate-pulse bg-white/45" />
               ))}
             </div>
           ) : visibleProducts.length > 0 ? (
             <div className="grid gap-5 sm:grid-cols-2">
               {visibleProducts.map((product, index) => (
                 <ProductCard
+                  index={index}
                   key={product.id}
                   product={product}
-                  index={index}
                   selected={selectedProduct?.id === product.id}
                   onSelect={setSelectedProduct}
                 />
@@ -385,15 +402,15 @@ function LiveProductDetails({ product }: { product: Product | null }) {
     <div className="space-y-5">
       <Card className="overflow-hidden p-0">
         <img
-          src={primaryVariant.imageUrl}
           alt={product.name}
           className="aspect-[4/3] w-full object-cover"
+          src={primaryVariant.imageUrl}
         />
         <div className="space-y-4 p-5">
           <div className="flex flex-wrap gap-2">
             <MarketplaceBadge
-              marketplace={primaryVariant.marketplace}
               color={getMarketplaceColor(primaryVariant.marketplace)}
+              marketplace={primaryVariant.marketplace}
             />
             <Badge>{product.category}</Badge>
           </div>
@@ -406,13 +423,13 @@ function LiveProductDetails({ product }: { product: Product | null }) {
             </p>
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
-            <div className="rounded-xl border border-white/[0.06] bg-white/[0.03] p-3">
+            <div className="rounded-lg border border-white/70 bg-white/35 p-3">
               <p className="text-xs text-content-tertiary">Цена</p>
               <p className="text-lg font-semibold text-content">
                 {formatKzt(product.retailPriceKzt)}
               </p>
             </div>
-            <div className="rounded-xl border border-success/20 bg-success/5 p-3">
+            <div className="rounded-lg border border-success/20 bg-success/10 p-3">
               <p className="text-xs text-content-tertiary">Групповая цена</p>
               <p className="text-lg font-semibold text-success">
                 {formatKzt(product.groupPriceKzt)}
@@ -420,10 +437,10 @@ function LiveProductDetails({ product }: { product: Product | null }) {
             </div>
           </div>
           <a
-            href={primaryVariant.sourceUrl}
-            target="_blank"
-            rel="noreferrer"
             className={buttonClasses("primary")}
+            href={primaryVariant.sourceUrl}
+            rel="noreferrer"
+            target="_blank"
           >
             <ExternalLink className="mr-1.5 size-4" />
             Открыть товар на {primaryVariant.marketplace}
