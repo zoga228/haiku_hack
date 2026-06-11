@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import type { FormEvent, RefObject } from "react";
 import type { Session } from "@supabase/supabase-js";
 import {
+  ArrowRight,
   Heart,
   Loader2,
   LogOut,
@@ -12,6 +13,7 @@ import {
   ShoppingBag,
   UploadCloud,
   UserRound,
+  UsersRound,
 } from "lucide-react";
 import { buttonClasses } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
@@ -55,8 +57,67 @@ const defaultUploadForm = {
 
 const feedTabs: Array<{ label: string; value: FeedView }> = [
   { label: "Лента", value: "feed" },
-  { label: "Маркет", value: "marketplace" },
-  { label: "Загрузка", value: "upload" },
+  { label: "Поиск", value: "marketplace" },
+  { label: "Загрузить", value: "upload" },
+];
+
+type PopularItem = {
+  title: string;
+  query: string;
+  price: string;
+  groupPrice: string;
+  imageUrl: string;
+};
+
+const popularItems: PopularItem[] = [
+  {
+    title: "iPhone 16 Pro",
+    query: "iPhone 16 Pro",
+    price: "от 539 000 ₸",
+    groupPrice: "группа от 499 000 ₸",
+    imageUrl:
+      "https://images.unsplash.com/photo-1695048133142-1a20484d2569?auto=format&fit=crop&w=900&q=85",
+  },
+  {
+    title: "AirPods Pro",
+    query: "AirPods Pro 2",
+    price: "от 89 000 ₸",
+    groupPrice: "группа от 79 000 ₸",
+    imageUrl:
+      "https://images.unsplash.com/photo-1606220945770-b5b6c2c55bf1?auto=format&fit=crop&w=900&q=85",
+  },
+  {
+    title: "MacBook Air",
+    query: "MacBook Air M3",
+    price: "от 479 000 ₸",
+    groupPrice: "группа от 449 000 ₸",
+    imageUrl:
+      "https://images.unsplash.com/photo-1517336714731-489689fd1ca8?auto=format&fit=crop&w=900&q=85",
+  },
+  {
+    title: "PlayStation 5",
+    query: "PlayStation 5 Slim",
+    price: "от 289 000 ₸",
+    groupPrice: "группа от 269 000 ₸",
+    imageUrl:
+      "https://images.unsplash.com/photo-1606813907291-d86efa9b94db?auto=format&fit=crop&w=900&q=85",
+  },
+  {
+    title: "Dyson Airwrap",
+    query: "Dyson Airwrap",
+    price: "от 249 000 ₸",
+    groupPrice: "группа от 229 000 ₸",
+    imageUrl:
+      "https://images.unsplash.com/photo-1522338242992-e1a54906a8da?auto=format&fit=crop&w=900&q=85",
+  },
+  {
+    title: "Nike sneakers",
+    query: "Nike running sneakers",
+    price: "от 42 000 ₸",
+    groupPrice: "группа от 36 000 ₸",
+    imageUrl:
+      "https://images.unsplash.com/photo-1542291026-7eec264c27ff?auto=format&fit=crop&w=900&q=85",
+  },
 ];
 
 export function VideoMarketplaceScroller() {
@@ -257,12 +318,16 @@ export function VideoMarketplaceScroller() {
       return;
     }
 
+    await runMarketplaceSearch(productQuery, 16);
+  }
+
+  async function runMarketplaceSearch(productQuery: string, limit = 16) {
     setMarketplaceLoading(true);
     setMarketplaceOffers([]);
     setStatus("Ищу товары в маркетплейсах...");
 
     try {
-      const payload = await fetchMarketplaceOffers(productQuery, 16);
+      const payload = await fetchMarketplaceOffers(productQuery, limit);
       setMarketplaceOffers(payload.offers ?? []);
       setStatus(
         payload.offers?.length
@@ -278,6 +343,12 @@ export function VideoMarketplaceScroller() {
     } finally {
       setMarketplaceLoading(false);
     }
+  }
+
+  function openPopularItem(item: PopularItem) {
+    setMarketplaceQuery(item.query);
+    setViewAndHash("marketplace");
+    void runMarketplaceSearch(item.query, 12);
   }
 
   function attachOfferToUpload(offer: MarketplaceOffer) {
@@ -452,25 +523,77 @@ export function VideoMarketplaceScroller() {
 
   return (
     <main className="space-y-8">
-      <section className="mx-auto flex min-h-[calc(100vh-7rem)] max-w-5xl flex-col items-center justify-center px-2 py-10 text-center text-white">
-        <p className="text-sm font-medium text-white/70">CoiNIS marketplace</p>
-        <h1 className="mt-4 text-5xl font-semibold tracking-tight sm:text-7xl lg:text-8xl">
-          Shop Together.
-          <br />
-          Save More.
-        </h1>
-        <p className="mt-7 max-w-2xl text-base leading-7 text-white/72">
-          Видео-лента, live-поиск товаров, карточки маркетплейсов и групповые
-          покупки в одном светлом интерфейсе.
-        </p>
+      <section className="mx-auto max-w-6xl py-8 text-white">
+        <div className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr] lg:items-end">
+          <div>
+            <p className="text-sm font-medium text-white/72">CoiNIS marketplace</p>
+            <h1 className="mt-3 max-w-xl text-4xl font-semibold tracking-tight sm:text-6xl">
+              Покупай дешевле вместе.
+            </h1>
+            <div className="mt-6 grid w-full max-w-md grid-cols-3 gap-2 rounded-full border border-white/25 bg-white/12 p-1 backdrop-blur-md">
+              {feedTabs.map((tab) => (
+                <button
+                  className={`rounded-full px-3 py-2 text-sm font-semibold transition ${
+                    view === tab.value
+                      ? "bg-white text-content shadow-sm"
+                      : "text-white/72 hover:bg-white/15 hover:text-white"
+                  }`}
+                  key={tab.value}
+                  onClick={() => setViewAndHash(tab.value)}
+                  type="button"
+                >
+                  {tab.label}
+                </button>
+              ))}
+            </div>
+          </div>
 
-        <div className="mt-8 grid w-full max-w-xl grid-cols-3 gap-2 rounded-full border border-white/25 bg-white/10 p-1 backdrop-blur-md">
+          <div className="grid gap-3 sm:grid-cols-3">
+            <HeroMetric label="Видео" value={String(videos.length)} />
+            <HeroMetric label="Лайки" value={formatCompact(sumBy(videos, "likes_count"))} />
+            <HeroMetric label="Просмотры" value={formatCompact(sumBy(videos, "views_count"))} />
+          </div>
+        </div>
+
+        <div className="mt-8 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          {popularItems.map((item) => (
+            <button
+              className="group overflow-hidden rounded-lg border border-white/70 bg-white/72 text-left text-content shadow-[0_16px_44px_rgba(20,93,140,0.14)] backdrop-blur transition hover:-translate-y-0.5 hover:bg-white"
+              key={item.title}
+              onClick={() => openPopularItem(item)}
+              type="button"
+            >
+              <div className="grid grid-cols-[104px_1fr] gap-3 p-3">
+                <img
+                  alt={item.title}
+                  className="aspect-square rounded-md object-cover"
+                  src={item.imageUrl}
+                />
+                <div className="min-w-0">
+                  <p className="font-semibold">{item.title}</p>
+                  <p className="mt-1 text-sm text-content-secondary">{item.price}</p>
+                  <p className="mt-2 text-sm font-semibold text-success">
+                    {item.groupPrice}
+                  </p>
+                  <span className="mt-3 inline-flex items-center text-sm font-semibold text-content">
+                    Найти
+                    <ArrowRight className="ml-1 size-4 transition group-hover:translate-x-0.5" />
+                  </span>
+                </div>
+              </div>
+            </button>
+          ))}
+        </div>
+      </section>
+
+      <section className="mx-auto max-w-5xl space-y-5" id={view}>
+        <div className="mx-auto grid w-full max-w-xl grid-cols-3 gap-2 rounded-full border border-white/60 bg-white/70 p-1 shadow-sm backdrop-blur-md">
           {feedTabs.map((tab) => (
             <button
               className={`rounded-full px-3 py-2 text-sm font-semibold transition ${
                 view === tab.value
                   ? "bg-white text-content shadow-sm"
-                  : "text-white/72 hover:bg-white/12 hover:text-white"
+                  : "text-content-secondary hover:bg-white/55 hover:text-content"
               }`}
               key={tab.value}
               onClick={() => setViewAndHash(tab.value)}
@@ -480,15 +603,6 @@ export function VideoMarketplaceScroller() {
             </button>
           ))}
         </div>
-
-        <div className="mt-8 grid w-full max-w-3xl gap-3 sm:grid-cols-3">
-          <HeroMetric label="Видео" value={String(videos.length)} />
-          <HeroMetric label="Лайки" value={formatCompact(sumBy(videos, "likes_count"))} />
-          <HeroMetric label="Просмотры" value={formatCompact(sumBy(videos, "views_count"))} />
-        </div>
-      </section>
-
-      <section className="mx-auto max-w-5xl space-y-5" id={view}>
         {!supabase ? <SupabaseSetupNotice /> : null}
 
         {status ? (
@@ -663,17 +777,14 @@ function FeedPanel({
   onView: (videoId: string) => void;
 }) {
   return (
-    <section className="space-y-4">
-      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <p className="text-sm text-content-secondary">Видео + товары</p>
-          <h2 className="text-2xl font-semibold text-content">Лента TikTok</h2>
-        </div>
-        <label className="relative block sm:w-80">
+    <section className="space-y-5">
+      <div className="mx-auto flex max-w-[430px] flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <h2 className="text-2xl font-semibold text-content">Лента</h2>
+        <label className="relative block sm:w-56">
           <Search className="pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-content-tertiary" />
           <input
             className={`${inputClasses} w-full py-2 pl-10 pr-3`}
-            placeholder="Поиск по видео или товару"
+            placeholder="Поиск"
             value={query}
             onChange={(event) => setQuery(event.target.value)}
           />
@@ -685,7 +796,7 @@ function FeedPanel({
           <Loader2 className="size-7 animate-spin text-content-secondary" />
         </Card>
       ) : videos.length ? (
-        <div className="snap-y snap-mandatory space-y-6">
+        <div className="mx-auto max-w-[430px] snap-y snap-mandatory space-y-6">
           {videos.map((video) => (
             <VideoCard
               key={video.id}
@@ -697,14 +808,10 @@ function FeedPanel({
           ))}
         </div>
       ) : (
-        <Card className="flex min-h-[360px] items-center justify-center text-center">
+        <Card className="mx-auto flex min-h-[360px] max-w-[430px] items-center justify-center text-center">
           <div>
             <Play className="mx-auto mb-3 size-8 text-content-tertiary" />
             <p className="font-semibold text-content">Видео пока нет</p>
-            <p className="mt-2 max-w-md text-sm leading-6 text-content-secondary">
-              Откройте вкладку загрузки, выберите товар с маркетплейса и
-              опубликуйте первый ролик.
-            </p>
           </div>
         </Card>
       )}
@@ -965,14 +1072,14 @@ function VideoCard({
 
   return (
     <article
-      className="snap-start overflow-hidden rounded-lg border border-white/70 bg-black shadow-[0_22px_70px_rgba(12,52,84,0.18)]"
+      className="snap-start overflow-hidden rounded-[28px] border border-white/70 bg-black shadow-[0_22px_70px_rgba(12,52,84,0.18)]"
       onMouseEnter={() => onView(video.id)}
       ref={cardRef}
     >
-      <div className="relative min-h-[70vh] bg-black sm:min-h-[760px]">
+      <div className="relative aspect-[9/16] w-full bg-black">
         {shouldLoadVideo ? (
           <video
-            className="absolute inset-0 h-full w-full object-contain sm:object-cover"
+            className="absolute inset-0 h-full w-full object-cover"
             controls
             loop
             playsInline
@@ -992,13 +1099,13 @@ function VideoCard({
           </button>
         )}
 
-        <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/72 to-transparent p-4">
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 bg-gradient-to-t from-black via-black/74 to-transparent p-3">
           <div className="pointer-events-auto space-y-3">
             <div>
-              <p className="text-sm font-semibold text-white">
+              <p className="text-xs font-semibold text-white/72">
                 {video.creator_name}
               </p>
-              <h2 className="mt-1 text-2xl font-bold text-white">{video.title}</h2>
+              <h2 className="mt-1 text-xl font-bold text-white">{video.title}</h2>
             </div>
             <ProductSheet video={video} />
           </div>
@@ -1031,15 +1138,16 @@ function VideoCard({
 
 function ProductSheet({ video }: { video: MarketplaceVideo }) {
   return (
-    <div className="grid gap-3 rounded-lg border border-white/70 bg-white/92 p-3 text-content shadow-lg backdrop-blur sm:grid-cols-[84px_1fr_auto] sm:items-center">
+    <div className="rounded-[22px] border border-white/70 bg-white/94 p-3 text-content shadow-lg backdrop-blur">
+      <div className="grid grid-cols-[64px_1fr] gap-3">
       {video.product_image_url ? (
         <img
           alt={video.product_name}
-          className="aspect-square w-full rounded-md object-cover sm:w-20"
+          className="aspect-square w-16 rounded-md object-cover"
           src={video.product_image_url}
         />
       ) : (
-        <div className="flex aspect-square w-full items-center justify-center rounded-md bg-accent/10 sm:w-20">
+        <div className="flex aspect-square w-16 items-center justify-center rounded-md bg-accent/10">
           <ShoppingBag className="size-6 text-accent" />
         </div>
       )}
@@ -1054,8 +1162,17 @@ function ProductSheet({ video }: { video: MarketplaceVideo }) {
           {formatProductPrice(video)}
         </p>
       </div>
+      </div>
+      <div className="mt-3 grid gap-2 sm:grid-cols-2">
       <a
         className={buttonClasses("primary")}
+        href={`/search#${slugForHash(video.product_name)}`}
+      >
+        <UsersRound className="mr-2 size-4" />
+        Подключиться
+      </a>
+      <a
+        className={buttonClasses("secondary")}
         href={video.product_url}
         rel="noreferrer"
         target="_blank"
@@ -1063,6 +1180,7 @@ function ProductSheet({ video }: { video: MarketplaceVideo }) {
         <ShoppingBag className="mr-2 size-4" />
         Купить
       </a>
+      </div>
     </div>
   );
 }
@@ -1230,6 +1348,14 @@ function isMissingProductCardColumns(message: string) {
     normalized.includes("product_origin_country") ||
     (normalized.includes("column") && normalized.includes("schema cache"))
   );
+}
+
+function slugForHash(value: string) {
+  return value
+    .toLowerCase()
+    .replace(/[^a-z0-9а-яё]+/gi, "-")
+    .replace(/(^-|-$)/g, "")
+    .slice(0, 80);
 }
 
 function sumBy(
