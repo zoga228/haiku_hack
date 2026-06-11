@@ -34,55 +34,46 @@ const inputClasses =
 
 const liveCategories: LiveCategory[] = [
   {
-    label: "iPhone",
-    query: "iPhone 16 Pro",
-    description: "Смартфоны Apple и аксессуары.",
-  },
-  {
-    label: "AirPods",
-    query: "AirPods Pro 2",
-    description: "Наушники, кейсы, аудио.",
-  },
-  {
-    label: "MacBook",
-    query: "MacBook Air M3",
-    description: "Ноутбуки и зарядки USB-C.",
-  },
-  {
-    label: "PlayStation",
-    query: "PlayStation 5 Slim",
-    description: "Консоли, игры, геймпады.",
-  },
-  {
-    label: "Dyson",
-    query: "Dyson Airwrap",
-    description: "Уход и техника для дома.",
-  },
-  {
-    label: "Кроссовки",
-    query: "Nike running sneakers",
-    description: "Nike, Adidas, повседневная обувь.",
-  },
-  {
     label: "Камеры",
     query: "2K indoor security camera",
-    description: "Домашние камеры и baby monitor.",
+    description: "Домашние камеры, видеонаблюдение, baby monitor.",
+  },
+  {
+    label: "Наушники",
+    query: "wireless ANC headphones",
+    description: "Bluetooth, шумоподавление, игровые и рабочие модели.",
+  },
+  {
+    label: "Телефоны",
+    query: "iPhone 15 case MagSafe",
+    description: "Смартфоны, чехлы, стекла и аксессуары.",
+  },
+  {
+    label: "Красота",
+    query: "K beauty skincare set",
+    description: "Уход, SPF, приборы и наборы.",
+  },
+  {
+    label: "Дом",
+    query: "robot vacuum cleaner",
+    description: "Уборка, кухня, свет, хранение.",
+  },
+  {
+    label: "Детям",
+    query: "kids STEM robot kit",
+    description: "Игрушки, школа, безопасность и baby care.",
+  },
+  {
+    label: "Авто",
+    query: "4K dash cam",
+    description: "Регистраторы, компрессоры, органайзеры.",
   },
   {
     label: "Офис",
     query: "portable monitor 15.6 inch",
-    description: "Мониторы, кресла и рабочее место.",
+    description: "Мониторы, столы, кресла и канцелярия.",
   },
 ];
-
-const hashSearchMap: Record<string, string> = {
-  airpods: "AirPods Pro 2",
-  dyson: "Dyson Airwrap",
-  iphone: "iPhone 16 Pro",
-  macbook: "MacBook Air M3",
-  playstation: "PlayStation 5 Slim",
-  sneakers: "Nike running sneakers",
-};
 
 const marketplaceOptions: Marketplace[] = [
   "Amazon",
@@ -120,21 +111,6 @@ export function ProductSearch() {
     if (saved) {
       setSearchHistory(JSON.parse(saved) as string[]);
     }
-  }, []);
-
-  useEffect(() => {
-    const hash = window.location.hash.replace("#", "").trim().toLowerCase();
-    if (!hash) return;
-
-    const decodedHash = decodeURIComponent(hash);
-    const hashQuery =
-      hashSearchMap[decodedHash] ||
-      decodedHash.replace(/-/g, " ").replace(/\s+/g, " ").trim();
-
-    if (!hashQuery) return;
-
-    setQuery(hashQuery);
-    void runLiveSearch(hashQuery);
   }, []);
 
   useEffect(() => {
@@ -209,17 +185,26 @@ export function ProductSearch() {
   return (
     <main className="space-y-8">
       <section className="mx-auto max-w-4xl pt-6 text-center text-white">
-        <h1 className="text-4xl font-semibold tracking-tight sm:text-6xl">
-          Каталог
+        <p className="text-sm font-medium text-white/70">CoiNIS live catalog</p>
+        <h1 className="mt-3 text-4xl font-semibold tracking-tight sm:text-6xl">
+          Найдите товар и соберите покупку вместе.
         </h1>
+        <p className="mx-auto mt-5 max-w-2xl text-sm leading-6 text-white/74 sm:text-base">
+          Каталог ищет реальные предложения на маркетплейсах через Bright Data,
+          сравнивает цены в KZT и сразу подключает групповую покупку.
+        </p>
       </section>
 
       <Card className="space-y-5">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
-          <SectionHeader eyebrow="Поиск" title="Что ищем?" />
+          <SectionHeader
+            description="Выберите категорию или введите запрос. Карточки приходят из live-поиска маркетплейсов, без мок-каталога."
+            eyebrow="Live marketplace search"
+            title="Ищем реальные товары через Bright Data"
+          />
           <Badge variant="accent">
             <Globe className="mr-1.5 size-3" />
-            Live
+            Live only
           </Badge>
         </div>
 
@@ -229,7 +214,7 @@ export function ProductSearch() {
             <input
               className={inputClasses}
               disabled={isLoading}
-              placeholder="iPhone, AirPods, MacBook..."
+              placeholder="Например: 2K indoor security camera"
               value={query}
               onChange={(event) => setQuery(event.target.value)}
             />
@@ -240,13 +225,13 @@ export function ProductSearch() {
             ) : (
               <Search className="mr-2 size-4" />
             )}
-            Найти
+            Найти live
           </Button>
         </form>
 
         <div className="space-y-3">
           <p className="text-xs font-semibold uppercase tracking-wider text-content-tertiary">
-            Популярное
+            Категории запускают live-поиск
           </p>
           <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
             {liveCategories.map((category) => (
@@ -327,8 +312,13 @@ export function ProductSearch() {
         <div className="space-y-5">
           <Card className="grid gap-3 md:grid-cols-[1fr_220px] md:items-end">
             <SectionHeader
-              eyebrow={lastSearch ? lastSearch : "Результаты"}
-              title={isLoading ? "Ищем..." : `${visibleProducts.length} товаров`}
+              description="Нажмите на карточку, чтобы открыть описание здесь же и создать групповую покупку."
+              eyebrow={lastSearch ? `Запрос: ${lastSearch}` : "Результаты"}
+              title={
+                isLoading
+                  ? "Ищем товары..."
+                  : `${visibleProducts.length} live-товаров найдено`
+              }
             />
             <label className="grid gap-2 text-sm font-medium text-content-secondary">
               <span className="flex items-center gap-2">
@@ -342,8 +332,8 @@ export function ProductSearch() {
               >
                 <option value="price-asc">Цена: по возрастанию</option>
                 <option value="price-desc">Цена: по убыванию</option>
-                <option value="wholesale-asc">Групповая: дешевле</option>
-                <option value="wholesale-desc">Групповая: дороже</option>
+                <option value="wholesale-asc">Групповая цена: по возрастанию</option>
+                <option value="wholesale-desc">Групповая цена: по убыванию</option>
               </select>
             </label>
           </Card>
@@ -375,7 +365,7 @@ export function ProductSearch() {
           ) : (
             <Card>
               <p className="text-sm text-content-secondary">
-                Выберите категорию или введите запрос.
+                Пока нет товаров. Нажмите категорию выше или запустите live-поиск.
               </p>
             </Card>
           )}
